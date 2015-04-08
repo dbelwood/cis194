@@ -76,3 +76,23 @@ module Fibonacci where
 
   fibs3 :: Stream Integer
   fibs3 = x / (1 - x - x^2)
+
+  data Matrix = Matrix (Integer, Integer) (Integer, Integer) deriving (Show)
+
+  instance Num Matrix where
+    (*) (Matrix (a,b) (p,q)) (Matrix (c, d) (r, s)) =
+      Matrix
+        (((a * c) + (b * d)), ((a * d) + (b * s)))
+        (((p * c) + (q * d)), ((p * d) + (q * s)))
+
+  fib4 :: Integer -> Integer
+  fib4 0 = 0
+  fib4 n = unpackMatrix (fib4' n)
+    where unpackMatrix (Matrix (a,b) (p,q)) = p
+
+  fib4' :: Integer -> Matrix
+  fib4' 1 = Matrix (1,1) (1,0)
+  fib4' n = if (even n) then fib_even(n) else fib_odd(n)
+    where
+      fib_even (n)  = (fib4' (quot n 2)) ^ 2
+      fib_odd (n)   = (fib4' 1) * (fib4' (quot (n - 1) 2) ^ 2)
