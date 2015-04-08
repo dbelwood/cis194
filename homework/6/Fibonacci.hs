@@ -73,3 +73,6 @@ module Fibonacci where
                 Cons (quot x y) (secondCoef y (thirdCoef xs (divStreams stream1 stream2 ) ys))
               secondCoef b cs = streamMap (\c -> ((quot 1 b) * c)) cs
               thirdCoef stream1 stream2 stream3 = stream1 + negate(stream2) * stream3
+
+  fibs3 :: Stream Integer
+  fibs3 = x / (1 - x - x^2)
