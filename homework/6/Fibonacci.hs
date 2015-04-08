@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
+
 module Fibonacci where
   import Data.List
 
@@ -46,3 +49,27 @@ module Fibonacci where
     interleaveStreams
       (streamRepeat x)
       (ruler' y (y + 1))
+
+  x :: Stream Integer
+  x = Cons 0 (Cons 1 (streamRepeat 0))
+
+  instance Num (Stream Integer) where
+    fromInteger n = Cons n (streamRepeat 0)
+    negate stream = streamMap (\x -> (-1) * x) stream
+    (+) stream1 stream2 =
+      addStreams stream1 stream2
+        where addStreams (Cons x xs) (Cons y ys) = Cons (x + y) (addStreams xs ys)
+    (*) stream1 stream2 =
+      multStreams stream1 stream2
+        where multStreams (Cons x xs) (Cons y ys) =
+                Cons (x * y) ((secondCoef x ys) + (thirdCoef xs y ys))
+              secondCoef a bs = streamMap (\b -> a * b) bs
+              thirdCoef as b bs = multStreams as (Cons b bs)
+
+  instance Fractional (Stream Integer) where
+    (/) stream1 stream2 =
+      divStreams stream1 stream2
+        where divStreams (Cons x xs) (Cons y ys) =
+                Cons (quot x y) (secondCoef y (thirdCoef xs (divStreams stream1 stream2 ) ys))
+              secondCoef b cs = streamMap (\c -> ((quot 1 b) * c)) cs
+              thirdCoef stream1 stream2 stream3 = stream1 + negate(stream2) * stream3
