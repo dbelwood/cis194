@@ -33,10 +33,16 @@ module Fibonacci where
   streamFromSeed f x = Cons x (streamFromSeed f (f x))
 
   interleaveStreams :: Stream a -> Stream a -> Stream a
-  interleaveStreams (Cons x xs) (Cons y ys) = (Cons x (interleaveStreams ys xs))
+  interleaveStreams (Cons x xs) ys = (Cons x (interleaveStreams ys xs))
 
   nats :: Stream Integer
   nats = streamFromSeed (\x -> x + 1) 0
 
-  --ruler :: Stream Integer
-  --ruler = ruler (streamMap (streamRepeat nats))
+  ruler :: Stream Integer
+  ruler = ruler' 0 1
+
+  ruler' ::  Integer -> Integer -> Stream Integer
+  ruler' x y =
+    interleaveStreams
+      (streamRepeat x)
+      (ruler' y (y + 1))
