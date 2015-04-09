@@ -8,8 +8,10 @@ import System.IO
 import Buffer
 
 import Control.Exception
-import Control.Monad.Trans.State
+import Control.Monad
+-- import Control.Monad.Trans.State
 import Control.Monad.IO.Class
+import Control.Monad.State
 
 import Control.Applicative
 import Control.Arrow       (first, second)
@@ -36,7 +38,7 @@ commands = map show [View, Edit, Next, Prev, Quit]
 -- Editor monad
 
 newtype Editor b a = Editor (StateT (b,Int) IO a)
-  deriving (Functor, Monad, MonadIO, MonadState (b,Int))
+  deriving (Applicative, Functor, Monad, MonadIO, MonadState (b,Int))
 
 runEditor :: Buffer b => Editor b a -> b -> IO a
 runEditor (Editor e) b = evalStateT e (b,0)
